@@ -12,8 +12,18 @@ JUPYTER_PORT := 8800
 #################################################################################
 # PYTHON ENVIRONMENT COMMANDS                                                   #
 #################################################################################
+install_conda:
+	# install anaconda
+	cd /tmp
+	sudo apt-get install -y curl \
+		&& curl -O https://repo.anaconda.com/archive/Anaconda3-2020.02-Linux-x86_64.sh \
+		&& bash Anaconda3-2020.02-Linux-x86_64.sh -b \
+		&& rm Anaconda3-2020.02-Linux-x86_64.sh
+	conda init bash
+
 create_environment:
 	conda create --name $(PROJECT_NAME) python=$(PYTHON_VERSION)
+	echo "source activate $(PROJECT_NAME)" > ~/.bashrc
 	@echo ">>> New conda env created. Activate with:\nsource activate $(PROJECT_NAME)"
 
 requirements:
@@ -39,12 +49,6 @@ docker_run:
 				-v $(PROJECT_DIR):/home/ubuntu/$(PROJECT_NAME) \
 				-v /raid/datasets:/home/ubuntu/$(PROJECT_NAME)/data \
 				-v /raid/experiments/$(PROJECT_NAME):/home/ubuntu/$(PROJECT_NAME)/experiments \
-				-it $(PROJECT_NAME):latest
-
-docker_run_local:
-	docker run --gpus all -p $(JUPYTER_PORT):$(JUPYTER_PORT) \
-				-v $(PROJECT_DIR):/home/ubuntu/$(PROJECT_NAME) \
-				-v /data/datasets:/home/ubuntu/$(PROJECT_NAME)/data \
 				-it $(PROJECT_NAME):latest
 
 #################################################################################
