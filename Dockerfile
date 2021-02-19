@@ -1,4 +1,5 @@
-FROM nvcr.io/nvidia/cuda:10.2-cudnn7-devel-ubuntu18.04
+# FROM nvcr.io/nvidia/cuda:10.2-cudnn7-devel-ubuntu18.04
+FROM nvcr.io/nvidia/cuda:11.1-cudnn8-devel-ubuntu18.04
 
 # pass these into build using
 # --build-arg UID=$(id -u) --build-arg GID=$(id -g)
@@ -27,7 +28,13 @@ USER ubuntu
 RUN chmod a+rwx /home/ubuntu/
 
 # Install Anaconda
-RUN make install_conda
+WORKDIR "/tmp"
+RUN \
+    sudo apt-get update \
+    && sudo apt-get install -y curl \
+    && curl -O https://repo.anaconda.com/archive/Anaconda3-2020.02-Linux-x86_64.sh \
+    && bash Anaconda3-2020.02-Linux-x86_64.sh -b \
+    && rm Anaconda3-2020.02-Linux-x86_64.sh
 ENV PATH /home/ubuntu/anaconda3/bin:$PATH
 
 # Updating Anaconda packages
@@ -41,7 +48,7 @@ RUN \
 ADD --chown=ubuntu . /home/ubuntu/pathgen
 WORKDIR "/home/ubuntu/pathgen"
 
-# set up the pagan conda environment
+# set up the pathgen conda environment
 SHELL ["/bin/bash", "-c"]
 RUN make create_environment
 RUN conda init bash
