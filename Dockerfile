@@ -1,5 +1,5 @@
-# FROM nvcr.io/nvidia/cuda:10.2-cudnn7-devel-ubuntu18.04
-FROM nvcr.io/nvidia/cuda:11.1-cudnn8-devel-ubuntu18.04
+FROM nvcr.io/nvidia/cuda:10.2-cudnn7-devel-ubuntu18.04
+# FROM nvcr.io/nvidia/cuda:11.1-cudnn8-devel-ubuntu18.04
 
 # pass these into build using
 # --build-arg UID=$(id -u) --build-arg GID=$(id -g)
