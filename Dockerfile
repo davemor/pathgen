@@ -11,8 +11,6 @@ ARG GID=1337
 
 LABEL maintainer="David Morrison"
 
-ENV TERM xterm-256color
-
 # scripts updates to base image
 # install sudo and gosu tools
 RUN \
@@ -53,6 +51,7 @@ WORKDIR "/home/ubuntu/pathgen"
 
 # set up the pathgen conda environment
 SHELL ["/bin/bash", "-c"]
+ENV TERM xterm-256color
 RUN make create_environment
 RUN conda init bash
 RUN echo "source activate pathgen" > ~/.bashrc
