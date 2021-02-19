@@ -57,7 +57,6 @@ ENV PATH /opt/conda/envs/env/bin:$PATH
 
 # install the projects dependencies
 RUN make requirements
-RUN make install_asap
 RUN make install_openslide
 
 # we are going to log in as root and then run the setup script
