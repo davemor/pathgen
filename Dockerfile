@@ -19,7 +19,7 @@ RUN \
     apt-get update -y \
     && apt-get install -y \
     && apt-get install -y build-essential \
-    && apt-get -y install sudo gosu
+    && apt-get -y install sudo gosu \
     && apt-get -y install git
 
 # Add user ubuntu with no password, add to sudo group
