@@ -11,6 +11,8 @@ ARG GID=1337
 
 LABEL maintainer="David Morrison"
 
+ENV TERM xterm-256color
+
 # scripts updates to base image
 # install sudo and gosu tools
 RUN \
@@ -18,6 +20,7 @@ RUN \
     && apt-get install -y \
     && apt-get install -y build-essential \
     && apt-get -y install sudo gosu
+    && apt-get -y install git
 
 # Add user ubuntu with no password, add to sudo group
 RUN groupadd -g $GID -o ubuntu

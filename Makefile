@@ -6,6 +6,9 @@ PROJECT_NAME = pathgen
 PYTHON_INTERPRETER = python
 PYTHON_VERSION = 3.6
 
+UID = $(shell id -u)
+GID = $(shell id -g)
+
 # network
 JUPYTER_PORT := 8800
 
@@ -32,7 +35,7 @@ install_openslide:
 # CONTAINER COMMANDS                                                            #
 #################################################################################
 docker_image:
-	docker build --build-arg UID=$UID GID=$GID -t $(PROJECT_NAME) .
+	docker build --build-arg UID=$(UID) --build-arg  GID=$(GID) -t $(PROJECT_NAME) .
 
 docker_run:
 	docker run --shm-size=16G \
