@@ -19,7 +19,6 @@ install_conda:
 		&& curl -O https://repo.anaconda.com/archive/Anaconda3-2020.02-Linux-x86_64.sh \
 		&& bash Anaconda3-2020.02-Linux-x86_64.sh -b \
 		&& rm Anaconda3-2020.02-Linux-x86_64.sh
-	conda init bash
 
 create_environment:
 	conda create --name $(PROJECT_NAME) python=$(PYTHON_VERSION)

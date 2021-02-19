@@ -12,14 +12,13 @@
 old_uid=$(id -u ubuntu)
 new_uid=$(stat -c %u ./notebooks)
 usermod -u $new_uid ubuntu &
-#kill $! # nasty hack - usermod is not exiting for some reason
-find ./ -user $old_uid -exec chown -h $new_uid {} \;
+find . -type d \( -path experiments -o -path data \) -prune -false -o -user $old_uid -exec chown -h $new_uid {} \;
 
 # sort out the group ids
 old_gid=$(id -g ubuntu)
 new_gid=$(stat -c %g ./notebooks)
 groupmod -g $new_gid ubuntu
-find ./ -group $old_gid -exec chgrp -h $new_gid {} \;
+find . -type d \( -path experiments -o -path data \) -prune -false -o -user $old_uid -exec chgrp -h $new_uid {} \;
 
 # groupadd -g 1005 data-writers
 # usermod -a -G data-writers ubuntu
