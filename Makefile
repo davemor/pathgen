@@ -32,7 +32,7 @@ install_openslide:
 # CONTAINER COMMANDS                                                            #
 #################################################################################
 docker_image:
-	docker build -t $(PROJECT_NAME) .
+	docker build --build-arg UID=$UID GID=$GID -t $(PROJECT_NAME) .
 
 docker_run:
 	docker run --shm-size=16G \
