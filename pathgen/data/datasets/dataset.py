@@ -1,12 +1,13 @@
 from abc import ABCMeta, abstractmethod
 from collections import Sequence
 from pathlib import Path
-from repath.data.slides.slide import SlideBase
-from typing import Callable, Dict, Tuple
-from repath.utils.paths import project_root
+from typing import Dict
 
 import pandas as pd
-from repath.data.annotations.annotation import AnnotationSet
+
+from pathgen.data.slides.slide import SlideBase
+from pathgen.data.annotations.annotation import AnnotationSet
+from pathgen.utils.paths import project_root
 
 
 class Dataset(Sequence, metaclass=ABCMeta):

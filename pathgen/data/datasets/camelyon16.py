@@ -1,7 +1,6 @@
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Dict
 
-import numpy as np
 import pandas as pd
 
 from pathgen.data.annotations import AnnotationSet
