@@ -1,17 +1,15 @@
 from pathlib import Path
 from typing import Dict, Tuple
 
-from sklearn.metrics import roc_curve, precision_recall_curve, auc
 import numpy as np
 import pandas as pd
 
-from repath.data.annotations import AnnotationSet
-from repath.data.annotations.asapxml import load_annotations
-from repath.data.datasets import Dataset
-from repath.data.slides.openslide import Slide
-from repath.data.slides import SlideBase
-from repath.utils.paths import project_root
-from repath.utils.metrics import conf_mat_raw, plotROC, plotROCCI, pre_re_curve
+from pathgen.data.annotations import AnnotationSet
+from pathgen.data.annotations.asapxml import load_annotations
+from pathgen.data.datasets import Dataset
+from pathgen.data.slides.openslide import Slide
+from pathgen.data.slides import SlideBase
+from pathgen.utils.paths import project_root
 
 
 class Camelyon16(Dataset):
