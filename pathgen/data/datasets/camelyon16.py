@@ -12,8 +12,8 @@ from pathgen.utils.paths import project_root
 
 
 class Camelyon16(Dataset):
-    def __init__(self, root: Path, paths: pd.DataFrame) -> None:
-        super().__init__(root, paths)
+    def __init__(self, name: str, root: Path, paths: pd.DataFrame) -> None:
+        super().__init__(name, root, paths)
 
     def load_annotations(self, file: Path) -> AnnotationSet:
         # if there is no annotation file the just pass and empty list
@@ -57,7 +57,7 @@ def training():
     )
     df["tags"] = ""
 
-    return Camelyon16(root, df)
+    return Camelyon16("camelyon16_training", root, df)
 
 
 def training_small():
@@ -87,9 +87,9 @@ def training_small():
     )
     df["tags"] = ""
 
-    df = df.sample(3)
+    df = df.sample(10)
 
-    return Camelyon16(root, df)
+    return Camelyon16("camelyon16_training_small", root, df)
 
 
 def testing():
