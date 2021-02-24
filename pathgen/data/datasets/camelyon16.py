@@ -57,7 +57,7 @@ def training():
     )
     df["tags"] = ""
 
-    return Camelyon16("camelyon16_training", root, df)
+    return Camelyon16("camelyon16.training", root, df)
 
 
 def training_small():
@@ -89,7 +89,7 @@ def training_small():
 
     df = df.sample(10)
 
-    return Camelyon16("camelyon16_training_small", root, df)
+    return Camelyon16("camelyon16.training_small", root, df)
 
 
 def testing():

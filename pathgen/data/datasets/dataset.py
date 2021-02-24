@@ -60,3 +60,16 @@ class Dataset(Sequence, metaclass=ABCMeta):
 
     def to_rel_path(self, path: Path) -> Path:
         return path.relative_to(project_root() / self.root)
+
+    def load_annotations_for_slide(self, idx: int) -> AnnotationSet:
+        row = self.paths.iloc[idx]
+        if row["annotation"] == "":
+            return []
+        else:
+            path = self.to_abs_path(row["annotation"])
+            return self.load_annotations(path)
+
+    def open_slide(self, idx: int):
+        row = self.paths.iloc[idx]
+        slide_path = self.to_abs_path(row["slide"])
+        return self.slide_cls(slide_path)

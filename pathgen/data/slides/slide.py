@@ -1,22 +1,11 @@
 from abc import ABCMeta, abstractmethod
 from pathlib import Path
-from typing import List, NamedTuple
+from typing import List
 
 import numpy as np
 from PIL import Image
-from pathgen.utils.geometry import Point, Size
-
-
-class Region(NamedTuple):
-    level: int
-    location: Point
-    size: Size
-
-    @classmethod
-    def patch(cls, x, y, size, level):
-        location = Point(x, y)
-        size = Size(size, size)
-        return Region(level, location, size)
+from pathgen.utils.geometry import Size
+from pathgen.data.slides.region import Region
 
 
 class SlideBase(metaclass=ABCMeta):
