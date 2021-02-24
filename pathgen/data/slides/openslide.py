@@ -9,7 +9,6 @@ from pathgen.utils.geometry import Size
 
 
 class Slide(SlideBase):
-
     def __init__(self, path: Path) -> None:
         self._path = path
         self._osr = None
