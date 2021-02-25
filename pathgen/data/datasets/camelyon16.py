@@ -87,7 +87,22 @@ def training_small():
     )
     df["tags"] = ""
 
-    df = df.sample(10)
+    # df = df.sample(10)
+    slides_for_small = [
+        "normal/normal_014.tif",
+        "normal/normal_038.tif",
+        "normal/normal_100.tif",
+        "tumor/tumor_024.tif",
+        "tumor/tumor_038.tif",
+        "tumor/tumor_054.tif",
+        "tumor/tumor_063.tif",
+        "tumor/tumor_065.tif",
+        "tumor/tumor_076.tif",
+        "tumor/tumor_089.tif",
+    ]
+    paths_for_small = [Path(s) for s in slides_for_small]
+    df = df.loc[df["slide"].isin(paths_for_small)]
+    df = df.reindex()
 
     return Camelyon16("camelyon16.training_small", root, df)
 

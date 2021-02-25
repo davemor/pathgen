@@ -1,11 +1,11 @@
 from abc import ABCMeta, abstractmethod
 import json
-from pathgen.data.annotations import annotation
 from pathlib import Path
 from typing import Sequence
 
+import cv2
+import numpy as np
 import pandas as pd
-from pathgen.data import datasets
 
 from pathgen.data.datasets import Dataset
 from pathgen.data.datasets.registry import get_dataset
@@ -30,6 +30,10 @@ class PatchSet(metaclass=ABCMeta):
     def load(cls, path: Path) -> "PatchSet":
         raise NotImplementedError
 
+    @abstractmethod
+    def export_patches(self, output_dir: Path) -> None:
+        raise NotImplementedError
+
     def as_df(self) -> pd.DataFrame:
         rows = [
             (r.as_values(), slide_idx, dataset_name)
@@ -39,14 +43,6 @@ class PatchSet(metaclass=ABCMeta):
             rows, columns=["x", "y", "width", "height", "slide_idx", "dataset_name"]
         )
         return frame
-
-     def export_patches(self, output_dir: Path) -> None:
-        # not optimal!!!! order by dataset, the slide to reduce loading
-        for region, slide_idx, dataset_name in self:
-            dataset = get_dataset(dataset_name)
-            with dataset.open_slide(slide_idx) as slide:
-                image = slide.read_region(region)
-                
 
 
 class SimplePatchSet(PatchSet, Sequence):
@@ -60,6 +56,7 @@ class SimplePatchSet(PatchSet, Sequence):
     ) -> None:
         self.dataset = dataset
         self.slide_idx = slide_idx
+        self.slide_path = dataset.get_slide_path(slide_idx)
         self.patch_size = patch_size
         self.level = level
         self.patches_df = patches_df
@@ -73,6 +70,47 @@ class SimplePatchSet(PatchSet, Sequence):
         ]
         region = Region.make(row.x, row.y, self.patch_size, self.level)
         return region, self.slide_idx, self.dataset.name
+
+    def export_patches(self, output_dir: Path) -> None:
+        with self.dataset.open_slide(self.slide_idx) as slide:
+            print(f"Writing patches for slide {self.slide_idx}")
+            for row in self.patches_df.itertuples():
+                # read the patch image from the slide
+                region = Region.patch(row.x, row.y, self.patch_size, self.level)
+                image = slide.read_region(region)
+
+                # get the patch label as a string
+                labels = {v: k for k, v in self.dataset.labels.items()}
+                label = labels[row.label]
+
+                # ensure the output directory exists
+                output_subdir = output_dir / label
+                output_subdir.mkdir(parents=True, exist_ok=True)
+
+                # write out the slide
+                rel_slide_path = self.dataset.to_rel_path(self.slide_path)
+                slide_name_str = str(rel_slide_path)[:-4].replace("/", "-")
+                patch_filename = slide_name_str + f"-{row.x}-{row.y}.png"
+                image_path = output_dir / label / patch_filename
+                cv2.imwrite(str(image_path), np.array(image))
+
+    def summary(self) -> pd.DataFrame:
+        """Gives a summary of number of patches for each class as a dataframe.
+        Returns:
+            pd.DataFrame: A summary dataframe defining number of patches for each class
+        """
+        by_label = self.patches_df.groupby("label").size()
+        labels = {v: k for k, v in self.dataset.labels.items()}
+        count_df = by_label.to_frame().T.rename(columns=labels)
+        columns = list(labels.values())
+        summary = pd.DataFrame(columns=columns)
+        for l in labels.values():
+            if l in count_df:
+                summary[l] = count_df[l]
+            else:
+                summary[l] = 0
+        summary = summary.replace(np.nan, 0)  # if there are no patches for some classes
+        return summary
 
     def save(self, path: Path) -> None:
         path.mkdir(parents=True, exist_ok=True)

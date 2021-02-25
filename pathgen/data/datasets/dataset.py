@@ -73,3 +73,8 @@ class Dataset(Sequence, metaclass=ABCMeta):
         row = self.paths.iloc[idx]
         slide_path = self.to_abs_path(row["slide"])
         return self.slide_cls(slide_path)
+
+    def get_slide_path(self, idx: int):
+        row = self.paths.iloc[idx]
+        slide_path = self.to_abs_path(row["slide"])
+        return slide_path
