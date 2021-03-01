@@ -36,11 +36,21 @@ class PatchSet(metaclass=ABCMeta):
 
     def as_df(self) -> pd.DataFrame:
         rows = [
-            (r.as_values(), slide_idx, dataset_name)
-            for r, slide_idx, dataset_name in self
+            list(r.as_values()) + [slide_idx, dataset_name, label]
+            for r, slide_idx, dataset_name, label in self
         ]
         frame = pd.DataFrame(
-            rows, columns=["x", "y", "width", "height", "slide_idx", "dataset_name"]
+            rows,
+            columns=[
+                "x",
+                "y",
+                "width",
+                "height",
+                "level",
+                "slide_idx",
+                "dataset_name",
+                "label",
+            ],
         )
         return frame
 
@@ -69,7 +79,7 @@ class SimplePatchSet(PatchSet, Sequence):
             idx,
         ]
         region = Region.make(row.x, row.y, self.patch_size, self.level)
-        return region, self.slide_idx, self.dataset.name
+        return region, self.slide_idx, self.dataset.name, row.label
 
     def export_patches(self, output_dir: Path) -> None:
         with self.dataset.open_slide(self.slide_idx) as slide:

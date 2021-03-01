@@ -50,7 +50,7 @@ docker_run:
 #################################################################################
 setup_jupyter:
 	pip install --user ipykernel
-	python -m ipykernel install --user --name=repath
+	python -m ipykernel install --user --name=pathgen
 
 run_notebook:
 	jupyter notebook --ip=* --port $(JUPYTER_PORT) --allow-root

@@ -168,3 +168,8 @@ target/
 
 # credentials folder for accessing services
 .credentials
+
+# more stuff
+notebooks/*.ckpt
+notebooks/lightning_logs
+experiments/

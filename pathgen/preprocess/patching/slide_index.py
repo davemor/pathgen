@@ -2,7 +2,7 @@ from pathgen.data.datasets.dataset import Dataset
 from typing import List, Sequence
 from pathlib import Path
 
-from pandas import pd
+import pandas as pd
 
 from pathgen.preprocess.patching.patchset import SimplePatchSet
 
