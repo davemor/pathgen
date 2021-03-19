@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import List
 
 from pathgen.data.datasets import Dataset
-from pathgen.preprocess.tissue_detector.tissue_detector import TissueDetector
+from pathgen.preprocess.tissue_detection import TissueDetector
 from pathgen.preprocess.patching.patch_finder import PatchFinder
 from pathgen.preprocess.patching.patchset import SimplePatchSet
 from pathgen.preprocess.patching.slide_index import SlidesIndex

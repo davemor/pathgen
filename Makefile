@@ -31,6 +31,9 @@ install_openslide:
 	pip install Pillow
 	pip install openslide-python
 
+install_opencv:
+	sudo apt-get update && apt-get install -y python3-opencv
+
 #################################################################################
 # CONTAINER COMMANDS                                                            #
 #################################################################################

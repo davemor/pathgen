@@ -44,6 +44,10 @@ class Dataset(Sequence, metaclass=ABCMeta):
     def labels(self) -> Dict[str, int]:
         raise NotImplementedError
 
+    @property
+    def labels_by_index(self) -> Dict[str, int]:
+        return {v: k for k, v in self.labels.items()}
+
     def __len__(self):
         return len(self.paths)
 
@@ -78,3 +82,9 @@ class Dataset(Sequence, metaclass=ABCMeta):
         row = self.paths.iloc[idx]
         slide_path = self.to_abs_path(row["slide"])
         return slide_path
+
+    def 
+
+    #def split_by_slide_label(self, label: str) -> List[Dataset]:
+    #    self.paths.groupby("label")
+
