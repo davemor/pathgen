@@ -4,11 +4,11 @@ from pathlib import Path
 
 import pandas as pd
 
-from pathgen.preprocess.patching.patchset import SimplePatchSet
+from pathgen.preprocess.patching.patchset import PatchSet
 
 
 class SlidesIndex(Sequence):
-    def __init__(self, dataset: Dataset, patches: List[SimplePatchSet]) -> None:
+    def __init__(self, dataset: Dataset, patches: List[PatchSet]) -> None:
         self.dataset = dataset
         self.patches = patches
 
@@ -33,5 +33,9 @@ class SlidesIndex(Sequence):
     def load(cls, dataset: Dataset, input_dir: Path) -> "SlidesIndex":
         subdirs = [x for x in input_dir.iterdir() if x.is_dir()]
         subdirs = sorted(subdirs)  # might not be required
-        patches = [SimplePatchSet.load(subdir) for subdir in subdirs]
+        patches = [PatchSet.load(subdir) for subdir in subdirs]
         cls(dataset, patches)
+
+    # def select(indices: List[int]) -> 'SlidesIndex':
+    # returns a subset of the slide index as a slide index
+

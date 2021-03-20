@@ -4,8 +4,8 @@ from typing import List
 from pathgen.data.datasets import Dataset
 from pathgen.preprocess.tissue_detection import TissueDetector
 from pathgen.preprocess.patching.patch_finder import PatchFinder
-from pathgen.preprocess.patching.patchset import SimplePatchSet
-from pathgen.preprocess.patching.slide_index import SlidesIndex
+from pathgen.preprocess.patching.patchset import PatchSet
+from pathgen.preprocess.patching.slides_index import SlidesIndex
 
 
 def index_slide(
@@ -26,7 +26,7 @@ def index_slide(
         df, level, size = patch_finder(
             labels_image, slide.dimensions[patch_finder.patch_level]
         )
-        patchset = SimplePatchSet(dataset, slide_idx, size, level, df)
+        patchset = PatchSet(df, size, level, slide_idx, dataset.name)
         return patchset
 
 

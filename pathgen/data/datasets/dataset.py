@@ -83,8 +83,6 @@ class Dataset(Sequence, metaclass=ABCMeta):
         slide_path = self.to_abs_path(row["slide"])
         return slide_path
 
-    def 
-
-    #def split_by_slide_label(self, label: str) -> List[Dataset]:
+    # def split_by_slide_label(self, label: str) -> List[Dataset]:
     #    self.paths.groupby("label")
 
