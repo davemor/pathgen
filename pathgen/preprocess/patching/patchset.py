@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict
 
 import cv2
 import pandas as pd
@@ -8,6 +8,7 @@ import numpy as np
 
 from pathgen.data.slides import SlideBase, Region
 from pathgen.data.datasets import Dataset, get_dataset
+from pathgen.utils.convert import invert
 
 
 class PatchDetails:
@@ -70,10 +71,21 @@ class PatchSet:
         self._dataset_name = dataset_name
         self._dataset = get_dataset(dataset_name) if dataset_name else None
 
+    # propeties
+    @property
+    def labels(self) -> Dict[str, int]:
+        if self._dataset:
+            return self._dataset.labels
+        else:
+            pass  # TODO: get this working with multiple datasets
+
+    # serialisation
     def save(self, path: Path) -> None:
         path.mkdir(parents=True, exist_ok=True)
-        self.patches_df.to_csv(path / "frame.csv")
-        fields = {f for f in self.__dict__ if f not in ["df", "dataset"]}
+        self.df.to_csv(path / "frame.csv")
+        exclude = ["df", "_dataset"]
+        fields = {k: v for k, v in self.__dict__.items() if k not in exclude}
+        fields = {k[1:]: v for k, v in fields.items()}
         data = {"type": type(self).__name__, "fields": fields}
         with open(path / "fields.json", "w") as outfile:
             json.dump(data, outfile)
@@ -83,11 +95,10 @@ class PatchSet:
         df = pd.read_csv(path / "frame.csv")
         with open(path / "fields.json") as json_file:
             fields = json.load(json_file)["fields"]
-            dataset = get_dataset(fields["dataset_name"])
             fields["df"] = df
-            fields["dataset"] = dataset
-            cls(**fields)
+        return cls(**fields)
 
+    # patch outputs
     def export(self, output_dir: Path) -> None:
         def sort_patches_by_slide():
             possible_columns = ["dataset_name", "slide_idx"]
@@ -119,14 +130,10 @@ class PatchSet:
 
     def summary(self) -> pd.DataFrame:
         groups = self.df.groupby("label")
-        labels = groups.labels.groups.keys()
-        counts = groups.size().to_frame().T.rename(columns=labels)
-        columns = list(labels.values())
-        summary = pd.DataFrame(columns=columns)
-        for l in labels.values():
-            if l in counts:
-                summary[l] = counts[l]
-            else:
-                summary[l] = 0
-        summary = summary.replace(np.nan, 0)
-        return summary
+        frame = groups.size().to_frame().T
+        frame = frame.rename(columns=invert(self.labels))
+        for label in self.labels:
+            if label not in frame.columns:
+                frame[label] = 0
+        frame = frame[self.labels.keys()]
+        return frame

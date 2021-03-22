@@ -8,8 +8,7 @@ from pathgen.preprocess.patching.patchset import PatchSet
 
 
 class SlidesIndex(Sequence):
-    def __init__(self, dataset: Dataset, patches: List[PatchSet]) -> None:
-        self.dataset = dataset
+    def __init__(self, patches: List[PatchSet]) -> None:
         self.patches = patches
 
     def __len__(self):
@@ -27,14 +26,14 @@ class SlidesIndex(Sequence):
 
     def save(self, output_dir: Path) -> None:
         for idx, patchset in enumerate(self.patches):
-            patchset.save(output_dir / f"{idx:02}")
+            patchset.save(output_dir / f"{idx}")
 
     @classmethod
-    def load(cls, dataset: Dataset, input_dir: Path) -> "SlidesIndex":
+    def load(cls, input_dir: Path) -> "SlidesIndex":
         subdirs = [x for x in input_dir.iterdir() if x.is_dir()]
         subdirs = sorted(subdirs)  # might not be required
         patches = [PatchSet.load(subdir) for subdir in subdirs]
-        cls(dataset, patches)
+        return cls(patches)
 
     # def select(indices: List[int]) -> 'SlidesIndex':
     # returns a subset of the slide index as a slide index

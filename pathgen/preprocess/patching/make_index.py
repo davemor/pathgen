@@ -37,4 +37,4 @@ def make_index(
         index_slide(idx, dataset, tissue_detector, patch_finder)
         for idx in range(len(dataset))
     ]
-    return SlidesIndex(dataset, patchsets)
+    return SlidesIndex(patchsets)

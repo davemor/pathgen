@@ -1,3 +1,5 @@
+from typing import Dict
+
 import numpy as np
 from PIL import Image
 
@@ -54,3 +56,7 @@ def to_frame_with_locations(
     samples["row"] = samples["row"].astype(int)
     samples["column"] = samples["column"].astype(int)
     return samples
+
+
+def invert(d: Dict) -> Dict:
+    return {v: k for k, v in d.items()}
