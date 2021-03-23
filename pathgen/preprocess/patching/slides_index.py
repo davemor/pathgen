@@ -35,6 +35,7 @@ class SlidesIndex(Sequence):
         patches = [PatchSet.load(subdir) for subdir in subdirs]
         return cls(patches)
 
-    # def select(indices: List[int]) -> 'SlidesIndex':
-    # returns a subset of the slide index as a slide index
+    def select(self, indices: List[int]) -> "SlidesIndex":
+        patchsets = [self[i] for i in indices]
+        return SlidesIndex(patchsets)
 

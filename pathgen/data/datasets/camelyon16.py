@@ -17,7 +17,15 @@ class Camelyon16(Dataset):
 
     def load_annotations(self, file: Path) -> AnnotationSet:
         # if there is no annotation file the just pass and empty list
-        annotations = load_annotations(file) if file else []
+        group_labels = {
+            "Tumor": "tumor",
+            "_0": "tumor",
+            "_1": "tumor",
+            "_2": "normal",
+            "Exclusion": "normal",
+            "None": "normal",
+        }
+        annotations = load_annotations(file, group_labels) if file else []
         labels_order = ["background", "tumor", "normal"]
         return AnnotationSet(annotations, self.labels, labels_order, "normal")
 
@@ -143,4 +151,45 @@ def testing():
     df["label"] = slide_labels
     df["tags"] = ""
 
-    return Camelyon16(root, df)
+    return Camelyon16("camelyon16.testing", root, df)
+
+
+def testing_small():
+    # set up the paths to the slides and annotations
+    root = project_root() / "data" / "camelyon16" / "raw" / "testing"
+    annotations_dir = root / "lesion_annotations"
+    slide_dir = root / "images"
+
+    # all paths are relative to the dataset 'root'
+    slide_paths = sorted([p.relative_to(root) for p in slide_dir.glob("*.tif")])
+    annotation_paths = sorted(
+        [p.relative_to(root) for p in annotations_dir.glob("*.xml")]
+    )
+
+    # get the slide name
+    slide_names = [p.stem for p in slide_paths]
+
+    # search for slides with annotations, add the annotation path if it exists else add empty string
+    slides_annotations_paths = []
+    for name in slide_names:
+        a_path = ""
+        for anno_path in annotation_paths:
+            if name in str(anno_path):
+                a_path = anno_path
+        slides_annotations_paths.append(a_path)
+
+    # get the slide labels by reading the csv file
+    csv_path = root / "reference.csv"
+    label_csv_file = pd.read_csv(csv_path, header=None)
+    slide_labels = label_csv_file.iloc[:, 1]
+
+    # turn them into a data frame and pad with empty annotation paths
+    df = pd.DataFrame()
+    df["slide"] = slide_paths
+    df["annotation"] = slides_annotations_paths
+    df["label"] = slide_labels
+    df["tags"] = ""
+
+    df = df.sample(4, random_state=123)
+
+    return Camelyon16("camelyon16.testing", root, df)

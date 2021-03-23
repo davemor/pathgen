@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 import cv2
 import pandas as pd
@@ -18,7 +18,7 @@ class PatchDetails:
         self.row = row
 
     def get(self, key: str) -> Any:
-        return self.row["key"] if key in self.row else self.fields[key]
+        return self.row[key] if key in self.row else self.fields[f"_{key}"]
 
     @property
     def patch_size(self) -> int:
@@ -82,7 +82,7 @@ class PatchSet:
     # serialisation
     def save(self, path: Path) -> None:
         path.mkdir(parents=True, exist_ok=True)
-        self.df.to_csv(path / "frame.csv")
+        self.df.to_csv(path / "frame.csv", index=False)
         exclude = ["df", "_dataset"]
         fields = {k: v for k, v in self.__dict__.items() if k not in exclude}
         fields = {k[1:]: v for k, v in fields.items()}
@@ -101,7 +101,7 @@ class PatchSet:
     # patch outputs
     def export(self, output_dir: Path) -> None:
         def sort_patches_by_slide():
-            possible_columns = ["dataset_name", "slide_idx"]
+            possible_columns = ["dataset_name", "slide_index"]
             sort_columns = [c for c in possible_columns if c in self.df.columns]
             if len(sort_columns) > 0:
                 self.df = self.df.sort_values(sort_columns, ignore_index=True)
@@ -114,19 +114,26 @@ class PatchSet:
 
         def save_patch(region: Region, slide: SlideBase, filepath: Path) -> None:
             image = slide.read_region(region)
-            cv2.imwrite(str(filepath), np.array(image))
+            opencv_image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+            cv2.imwrite(str(filepath), np.array(opencv_image))
 
         # for each row in the dataframe output the image
         sort_patches_by_slide()
         dataset_name, slide_idx, slide = None, None, None
+        print("Exporting patches for: ", end="")
         for _, row in self.df.iterrows():
             p = PatchDetails(self, row)
             if dataset_name != p.dataset_name or slide_idx != p.slide_idx:
+                dataset_name = p.dataset_name
+                slide_idx = p.slide_idx
                 if slide:
                     slide.close()
-                slide = p.dataset.open_slide(p.slide_idx)
+                slide = p.dataset.open_slide(slide_idx)
+                slide.open()
+                print(f"{slide_idx}", end=", ")
             filepath = make_patch_path(p)
             save_patch(p.region, slide, filepath)
+        print("Complete.")
 
     def summary(self) -> pd.DataFrame:
         groups = self.df.groupby("label")
@@ -137,3 +144,33 @@ class PatchSet:
                 frame[label] = 0
         frame = frame[self.labels.keys()]
         return frame
+
+
+def combine(patchsets: List[PatchSet]) -> PatchSet:
+    def to_frame(ps: PatchSet) -> pd.DataFrame:
+        frame = ps.df.copy(deep=True)
+        for attr in ["patch_size", "level", "slide_index", "dataset_name"]:
+            value = getattr(ps, f"_{attr}", None)
+            if attr not in frame.columns:
+                frame[attr] = value
+        return frame
+
+    # create one big data frame with all the patch data in it
+    frames = [to_frame(ps) for ps in patchsets]
+    combined_df = pd.concat(frames, ignore_index=True)
+
+    # optimise
+    def is_unique(s):
+        a = s.to_numpy()
+        return (a[0] == a).all()
+
+    cols = ["patch_size", "level", "slide_index", "dataset_name"]
+    args = {}
+    for col in cols:
+        if is_unique(combined_df[col]):
+            series = combined_df[col]
+            args[col] = series[0]
+            combined_df.pop(col)
+    args["df"] = combined_df
+
+    return PatchSet(**args)
