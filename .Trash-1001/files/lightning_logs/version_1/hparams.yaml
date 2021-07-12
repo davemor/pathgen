@@ -1,0 +1,6 @@
+beta1: 0.5
+feature_maps_disc: 64
+feature_maps_gen: 64
+image_channels: 3
+latent_dim: 100
+learning_rate: 0.0002
