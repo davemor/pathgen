@@ -3,7 +3,7 @@
 from click import group, version_option, command, argument
 from multiprocessing import set_start_method
 
-import pathgen.experiments.one as one
+import pathgen.experiments.new as new
 
 
 @group()
