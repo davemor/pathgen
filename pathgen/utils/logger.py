@@ -16,17 +16,22 @@ class LoggedVariable:
 class Logger:
     def __init__(self):
         self.variables = {}
+        self.current_epoch = 0
     
     def __call__(self, key, value):
         if key not in self.variables:
             self.variables[key] = LoggedVariable()
         self.variables[key].append(value)
     
-    def end_epoch(self, epoch):
-        print(f"end epoch {epoch}", end = '')
-        for key, val in self.variables.items():
+    def end_epoch(self):
+        self.current_epoch += 1
+        for _, val in self.variables.items():
             val.end_epoch()
-            print(f" {key}: {val.epoch_values[epoch]:.2f}", end = '')
+
+    def print_summary_of_latest_epoch(self):
+        print('\r', f"epoch {self.current_epoch}", end = '\t')
+        for key, val in self.variables.items():
+            print(f" {key}: {val.epoch_values[-1]:.2f} ", end = '\t')
         print()
     
     def history(self):
